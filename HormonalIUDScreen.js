@@ -6,7 +6,7 @@ import { RadioButton } from 'react-native-paper';
 import ReviewStars from './ReviewStars';
 import RatingStars from './RatingStars';
 
-const BirthControlpillsScreen = () => {
+const HormonalIUDScreen = () => {
   const [contraceptives, setContraceptives] = useState([]);
   const [reviewContraceptiveName, setReviewContraceptiveName] = useState('');
   const [reviewText, setReviewText] = useState('');
@@ -35,7 +35,7 @@ const BirthControlpillsScreen = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
     db.collection('reviews').add({
-      contraceptiveID: "4ptyc40jMjQVDGnOZ4ny",
+      contraceptiveID: "80568N9VG4uPnVPsIjmO",
       reviewContraceptiveName,
       reviewText,
       reviewRating,
@@ -187,13 +187,13 @@ const BirthControlpillsScreen = () => {
     )
   };
 
-  const birthControlpills = contraceptives.find(c => c.contraceptiveName === "Birth Control pills");
-  const filteredReviews = reviews.filter((review) => review.contraceptiveID === "4ptyc40jMjQVDGnOZ4ny");
+  const hormonalIUD = contraceptives.find(c => c.contraceptiveName === "Hormonal IUD");
+  const filteredReviews = reviews.filter((review) => review.contraceptiveID === "80568N9VG4uPnVPsIjmO");
   const starAverage = filteredReviews.reduce((acc, review) => acc + review.reviewRating, 0) / filteredReviews.length;
 
   return (
     <View style={styles.container}>
-      <Image style={styles.contraceptiveImages} source={{ uri: birthControlpills?.contraceptiveImage }} />
+      <Image style={styles.contraceptiveImages} source={{ uri: hormonalIUD?.contraceptiveImage }} />
       <ReviewStars reviewRating={isNaN(starAverage) ? 0 : starAverage} />
 
       <View style={styles.reviewTitleContent}>
@@ -208,7 +208,7 @@ const BirthControlpillsScreen = () => {
       </View>
 
       <ScrollView style={styles.reviewsList}>
-        {reviews.filter((review) => review.contraceptiveID === "4ptyc40jMjQVDGnOZ4ny").map((review) => (
+        {reviews.filter((review) => review.contraceptiveID === "80568N9VG4uPnVPsIjmO").map((review) => (
           <View style={styles.reviewItem} key={review.id}>
             <Text style={styles.contraceptiveUsed}>Brand used: {review.reviewContraceptiveName}</Text>
             <Text style={styles.contraceptiveUsed}>Amount of time used: {review.reviewTime}</Text>
@@ -375,4 +375,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default BirthControlpillsScreen;
+export default HormonalIUDScreen;

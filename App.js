@@ -9,6 +9,9 @@ import CoppercoilScreen from './CoppercoilScreen'
 import BirthControlpillsScreen from './BirthControlpillsScreen'
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebase";
+import ImplantScreen from './ImplantScreen';
+import HormonalIUDScreen from './HormonalIUDScreen';
+import OtherScreen from './OtherScreen';
 
 const Stack = createStackNavigator();
 
@@ -63,6 +66,45 @@ function App() {
             <Stack.Screen
               name="Birth Control pills"
               component={BirthControlpillsScreen}
+              options={{
+                headerStyle: {
+                  backgroundColor: '#5CCFBA',
+                },
+                headerTintColor: 'white',
+                headerTitleStyle: {
+                  fontWeight: 'bold',
+                },
+              }}
+            />
+            <Stack.Screen
+              name="Implant"
+              component={ImplantScreen}
+              options={{
+                headerStyle: {
+                  backgroundColor: '#5CCFBA',
+                },
+                headerTintColor: 'white',
+                headerTitleStyle: {
+                  fontWeight: 'bold',
+                },
+              }}
+            />
+            <Stack.Screen
+              name="Hormonal IUD"
+              component={HormonalIUDScreen}
+              options={{
+                headerStyle: {
+                  backgroundColor: '#5CCFBA',
+                },
+                headerTintColor: 'white',
+                headerTitleStyle: {
+                  fontWeight: 'bold',
+                },
+              }}
+            />
+            <Stack.Screen
+              name="Other"
+              component={OtherScreen}
               options={{
                 headerStyle: {
                   backgroundColor: '#5CCFBA',

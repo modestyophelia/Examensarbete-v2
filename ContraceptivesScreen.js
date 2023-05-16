@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView } from "react-native";
 import { signOut } from "firebase/auth";
 import { auth, db } from './firebase';
 import { collection, getDocs } from "firebase/firestore";
@@ -24,36 +24,51 @@ const ContraceptivesScreen = ({ navigation }) => {
 
   const handlePress = (contraceptive) => {
     const { contraceptiveName, id } = contraceptive;
-    const screenName = contraceptiveName === 'Copper coil' ? 'Copper coil' :
-      contraceptiveName === 'Birth Control pills' ? 'Birth Control pills' :
-        '';
+    let screenName = "";
+
+    if (contraceptiveName === 'Copper coil') {
+      screenName = 'Copper coil';
+    } else if (contraceptiveName === 'Birth Control pills') {
+      screenName = 'Birth Control pills';
+    } else if (contraceptiveName === 'Implant') {
+      screenName = 'Implant';
+    } else if (contraceptiveName === 'Hormonal IUD') {
+      screenName = 'Hormonal IUD';
+    } else if (contraceptiveName === 'Other') {
+      screenName = 'Other';
+    }
+
     if (screenName) {
       navigation.navigate(screenName, { contraceptiveId: id });
     }
-  }
+  };
 
   return (
     <View style={styles.container}>
-      {contraceptives.map((contraceptive) => (
-        <View key={contraceptive.id}>
-          <Text style={styles.contraceptiveName}>
-            {contraceptive.contraceptiveName}
-          </Text>
-          <TouchableOpacity
-            style={styles.buttonImage}
-            onPress={() => handlePress(contraceptive)}
-          >
-            <Image
-              style={styles.contraceptiveImages}
-              source={{ uri: contraceptive.contraceptiveImage }}
-              accessibilityLabel={contraceptive.contraceptiveName}
-            />
+      <ScrollView>
+        {contraceptives.map((contraceptive) => (
+          <View key={contraceptive.id}>
+            <Text style={styles.contraceptiveName}>
+              {contraceptive.contraceptiveName}
+            </Text>
+            <TouchableOpacity
+              style={styles.buttonImage}
+              onPress={() => handlePress(contraceptive)}
+            >
+              <Image
+                style={styles.contraceptiveImages}
+                source={{ uri: contraceptive.contraceptiveImage }}
+                accessibilityLabel={contraceptive.contraceptiveName}
+              />
+            </TouchableOpacity>
+          </View>
+        ))}
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.button} onPress={handleSignOut}>
+            <Text style={styles.buttonText}>Sign Out</Text>
           </TouchableOpacity>
         </View>
-      ))}
-      <TouchableOpacity style={styles.button} onPress={handleSignOut}>
-        <Text style={styles.buttonText}>Sign Out</Text>
-      </TouchableOpacity>
+      </ScrollView>
     </View>
   );
 };
@@ -77,17 +92,22 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontSize: 16,
+    alignItems: 'center',
+  },
+  buttonContainer: {
+    alignItems: 'center',
   },
   contraceptiveImages: {
     width: 325,
     height: 130,
     borderRadius: 5,
     marginBottom: 10,
+    marginTop: 15,
   },
   contraceptiveName: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginTop: 15,
     color: 'black',
     position: 'absolute',
     paddingTop: 10,

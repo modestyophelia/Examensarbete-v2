@@ -6,6 +6,7 @@ const StarRating = styled(View)`
   display: flex;
   flex-direction: row;
   font-size: 0;
+  margin-left: 5;
 `;
 
 const StarLabel = styled(Text)`
