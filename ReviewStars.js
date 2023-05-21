@@ -1,37 +1,35 @@
 import React from "react";
 import { View, Text } from "react-native";
-import styled from "styled-components/native";
+import styled from 'styled-components/native';
 
 const StarRating = styled(View)`
-  display: flex;
   flex-direction: row;
   font-size: 0;
-  margin-left: 5;
+  margin-left: 5px;
 `;
 
 const StarLabel = styled(Text)`
-  display: flex;
   font-size: 24px;
-  color: lightgrey;
-
-  &.filled {
-    color: gold;
-  }
+  color: ${({ filled }) => (filled ? "gold" : "lightgrey")};
 `;
 
-const ReviewStars = ({ reviewRating }) => {
-  const numStars = Math.round(reviewRating);
+const ReviewStars = ({ starAverage }) => {
+  const numStars = Math.round(starAverage);
+
+  const renderStars = (count, filled) => {
+    if (isNaN(count) || count <= 0) return null;
+
+    return Array.from({ length: count }).map((_, index) => (
+      <StarLabel key={index} filled={filled}>
+        ★
+      </StarLabel>
+    ));
+  };
 
   return (
     <StarRating>
-      {[...Array(numStars)].map((_, index) => (
-        <StarLabel key={index} style={{ color: "gold" }}>
-          ★
-        </StarLabel>
-      ))}
-      {[...Array(5 - numStars)].map((_, index) => (
-        <StarLabel key={index}>☆</StarLabel>
-      ))}
+      {renderStars(numStars, true)}
+      {renderStars(5 - numStars, false)}
     </StarRating>
   );
 };

@@ -1,10 +1,9 @@
 import { db } from './firebase';
 import React, { useState, useEffect } from "react";
-import { View, Text, Image, ScrollView, TextInput, StyleSheet, Modal, TouchableOpacity } from 'react-native';
+import { View, SafeAreaView, Text, Image, ScrollView, TextInput, StyleSheet, Modal, TouchableOpacity } from 'react-native';
 import { collection, getDocs } from "firebase/firestore";
-import { RadioButton } from 'react-native-paper';
 import ReviewStars from './ReviewStars';
-import RatingStars from './RatingStars';
+import ReviewFormModal from './ReviewFormModal';
 
 const BirthControlpillsScreen = () => {
   const [contraceptives, setContraceptives] = useState([]);
@@ -17,8 +16,10 @@ const BirthControlpillsScreen = () => {
   const [reviewSkin, setReviewSkin] = useState('');
   const [reviewTime, setReviewTime] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
-
   const [reviews, setReviews] = useState([]);
+  const [starAverage, setStarAverage] = useState(0);
+
+  console.log("starAverage:", starAverage);
 
   useEffect(() => {
     const unsubscribe = db.collection('reviews').onSnapshot((querySnapshot) => {
@@ -27,6 +28,10 @@ const BirthControlpillsScreen = () => {
         reviewsData.push({ id: doc.id, ...doc.data() });
       });
       setReviews(reviewsData);
+
+      const filteredReviews = reviewsData.filter((review) => review.contraceptiveID === "4ptyc40jMjQVDGnOZ4ny");
+      const averageRating = filteredReviews.reduce((acc, review) => acc + review.reviewRating, 0) / filteredReviews.length;
+      setStarAverage(isNaN(averageRating) ? 0 : averageRating);
     });
 
     return () => unsubscribe();
@@ -50,11 +55,9 @@ const BirthControlpillsScreen = () => {
     setReviewRating(0);
     setReviewMoods('');
     setReviewWeight('');
-    setReviewWeight('');
     setReviewDrive('');
     setReviewSkin('');
     setReviewTime('');
-
   };
 
   useEffect(() => {
@@ -67,134 +70,18 @@ const BirthControlpillsScreen = () => {
     getContraceptives();
   }, []);
 
-  const showModal = () => {
-    return (
-      <Modal visible={modalVisible} animationType="slide" transparent={true}>
-        <View style={styles.modal}>
-          <ScrollView>
-            <TouchableOpacity
-              style={styles.modalBackground}
-              activeOpacity={1}
-            >
-              <View style={styles.modalContent}>
-                <View style={styles.reviewFormContainer}>
-                  <Text style={styles.reviewFormTitle}>Contraceptive Review Form</Text>
-                  <Text style={styles.reviewFormTopInputs}>What brand did you use?</Text>
-                  <TextInput
-                    style={styles.brandUsed}
-                    placeholder="For example Yaz"
-                    value={reviewContraceptiveName}
-                    onChangeText={(text) => setReviewContraceptiveName(text)}
-                  />
-
-
-                  <Text style={styles.reviewFormTopInputs}>How long have you been using or did you use this type of contraception?</Text>
-                  <TextInput
-                    style={styles.brandUsed}
-                    placeholder="Specify if its years, months or weeks"
-                    value={reviewTime}
-                    onChangeText={(text) => setReviewTime(text)}
-                  />
-
-                  <View>
-                    <View style={styles.radioButtonTitle}>
-                      <Text style={styles.radioButtonTextContent}>How do you feel this contraception has affected your moods and emotions?</Text>
-                    </View>
-                    <View style={styles.radioButtonsContainer}>
-                      <RadioButton.Group onValueChange={(value) => setReviewMoods(value)} value={reviewMoods}>
-                        <RadioButton.Item label="Very positively" value="Very positively" />
-                        <RadioButton.Item label="Somewhat positively" value="Somewhat positively" />
-                        <RadioButton.Item label="Neutral/No change" value="Neutral/No change" />
-                        <RadioButton.Item label="Somewhat negatively" value="Somewhat negatively" />
-                        <RadioButton.Item label="Very negatively" value="Very negatively" />
-                        <RadioButton.Item label="I don't know/Cant tell" value="I don't know/Cant tell" />
-                      </RadioButton.Group>
-                    </View>
-
-                    <View style={styles.radioButtonTitle}>
-                      <Text style={styles.radioButtonTextContent}>Have you noticed any change to your body weight whilst using this contraception?</Text>
-                    </View>
-                    <View style={styles.radioButtonsContainer}>
-                      <RadioButton.Group onValueChange={(value) => setReviewWeight(value)} value={reviewWeight}>
-                        <RadioButton.Item label="I lost weight" value="I lost weight" />
-                        <RadioButton.Item label="Somewhat positively" value="Somewhat positively" />
-                        <RadioButton.Item label="Neutral/No change" value="Neutral/No change" />
-                        <RadioButton.Item label="Somewhat negatively" value="Somewhat negatively" />
-                        <RadioButton.Item label="I gained weight" value="I gained weight" />
-                        <RadioButton.Item label="I don't know/Cant tell" value="I don't know/Cant tell" />
-                      </RadioButton.Group>
-                    </View>
-
-                    <View style={styles.radioButtonTitle}>
-                      <Text style={styles.radioButtonTextContent}>Have you noticed any changes to your sex drive whilst using this contraception?</Text>
-                    </View>
-                    <View style={styles.radioButtonsContainer}>
-                      <RadioButton.Group onValueChange={(value) => setReviewDrive(value)} value={reviewDrive}>
-                        <RadioButton.Item label="Increased sex drive" value="Increased sex drive" />
-                        <RadioButton.Item label="Neutral/No change" value="Neutral/No change" />
-                        <RadioButton.Item label="Loss of sex drive" value="Loss of sex drive" />
-                        <RadioButton.Item label="I don't know/Cant tell" value="I don't know/Cant tell" />
-                      </RadioButton.Group>
-                    </View>
-
-                    <View style={styles.radioButtonTitle}>
-                      <Text style={styles.radioButtonTextContent}>Have you noticed any changes to your skin whilst using this contraception?</Text>
-                    </View>
-                    <View style={styles.radioButtonsContainer}>
-                      <RadioButton.Group onValueChange={(value) => setReviewSkin(value)} value={reviewSkin}>
-                        <RadioButton.Item label="My skin improved - fewer spots or acne" value="Skin improved - fewer spots or acne" />
-                        <RadioButton.Item label="Neutral/No change" value="Neutral/No change" />
-                        <RadioButton.Item label="My skin got worse - more spots or acne" value="Skin got worse - more spots or acne" />
-                        <RadioButton.Item label="I don't know/Cant tell" value="I don't know/Cant tell" />
-                      </RadioButton.Group>
-                    </View>
-
-                    <View>
-                      <View style={styles.radioButtonTitle}>
-                        <Text style={styles.radioButtonTextContent}>Overall how satisfied are you or were you with this contraception?</Text>
-                      </View>
-                      <View style={styles.reviewRatingContainer}>
-                        <RatingStars reviewRating={reviewRating} onChange={(newRating) => setReviewRating(newRating)} />
-                      </View>
-                    </View>
-
-                    <View>
-                      <Text style={styles.reviewFormTopInputs}>Please summarise your experience in a few sentences</Text>
-                      <TextInput
-                        style={styles.experienceInput}
-                        placeholder=""
-                        value={reviewText}
-                        onChangeText={(text) => setReviewText(text)}
-                        multiline
-                      />
-                    </View>
-
-                    <View style={styles.submitButtonContainer}>
-                      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-                        <Text style={styles.submitButtonText}>Submit Review</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity style={styles.submitButton} onPressOut={() => setModalVisible(false)}>
-                        <Text style={styles.submitButtonText}>Close</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                </View>
-              </View>
-            </TouchableOpacity>
-          </ScrollView>
-        </View>
-      </Modal >
-    )
-  };
-
   const birthControlpills = contraceptives.find(c => c.contraceptiveName === "Birth Control pills");
-  const filteredReviews = reviews.filter((review) => review.contraceptiveID === "4ptyc40jMjQVDGnOZ4ny");
-  const starAverage = filteredReviews.reduce((acc, review) => acc + review.reviewRating, 0) / filteredReviews.length;
+
+  const handleReviewRatingChange = (rating) => {
+    setReviewRating(rating);
+  };
 
   return (
     <View style={styles.container}>
       <Image style={styles.contraceptiveImages} source={{ uri: birthControlpills?.contraceptiveImage }} />
-      <ReviewStars reviewRating={isNaN(starAverage) ? 0 : starAverage} />
+      <View style={styles.reviewStarsContainer}>
+        <ReviewStars starAverage={isNaN(starAverage) ? 0 : starAverage} />
+      </View>
 
       <View style={styles.reviewTitleContent}>
         <Text style={styles.reviewsHeader}>User reviews</Text>
@@ -204,31 +91,57 @@ const BirthControlpillsScreen = () => {
         >
           <Text style={styles.buttonText}>Write a review</Text>
         </TouchableOpacity>
-        {showModal()}
+        {modalVisible && (
+          <ReviewFormModal
+            modalVisible={modalVisible}
+            setModalVisible={setModalVisible}
+            reviewContraceptiveName={reviewContraceptiveName}
+            setReviewContraceptiveName={setReviewContraceptiveName}
+            reviewText={reviewText}
+            setReviewText={setReviewText}
+            reviewRating={reviewRating}
+            setReviewRating={handleReviewRatingChange}
+            reviewMoods={reviewMoods}
+            setReviewMoods={setReviewMoods}
+            reviewWeight={reviewWeight}
+            setReviewWeight={setReviewWeight}
+            reviewDrive={reviewDrive}
+            setReviewDrive={setReviewDrive}
+            reviewSkin={reviewSkin}
+            setReviewSkin={setReviewSkin}
+            reviewTime={reviewTime}
+            setReviewTime={setReviewTime}
+            handleSubmit={handleSubmit}
+          />
+        )}
       </View>
 
       <ScrollView style={styles.reviewsList}>
-        {reviews.filter((review) => review.contraceptiveID === "4ptyc40jMjQVDGnOZ4ny").map((review) => (
-          <View style={styles.reviewItem} key={review.id}>
-            <Text style={styles.contraceptiveUsed}>Brand used: {review.reviewContraceptiveName}</Text>
-            <Text style={styles.contraceptiveUsed}>Amount of time used: {review.reviewTime}</Text>
+        {reviews
+          .filter((review) => review.contraceptiveID === "4ptyc40jMjQVDGnOZ4ny")
+          .map((review) => (
+            <View style={styles.reviewItem} key={review.id}>
+              <Text style={styles.contraceptiveUsed}>Brand used: {review.reviewContraceptiveName}</Text>
+              <Text style={styles.contraceptiveUsed}>Amount of time used: {review.reviewTime}</Text>
 
-            <ReviewStars style={styles.reviewStars} reviewRating={review.reviewRating} />
+              <ReviewStars starAverage={review.reviewRating} />
 
-            <Text style={styles.reviewText}>{review.reviewText}</Text>
-            <Text>
-              Mood: {review.reviewMoods}
-              {'\n'}
-              Weight: {review.reviewWeight}
-              {'\n'}
-              Sex drive: {review.reviewDrive}
-              {'\n'}
-              Skin: {review.reviewSkin}
-            </Text>
-          </View>
-        ))}
+              <Text style={styles.reviewText}>{review.reviewText}</Text>
+
+              <Text>
+                Mood: {review.reviewMoods}
+                {'\n'}
+                Weight: {review.reviewWeight}
+                {'\n'}
+                Sex drive: {review.reviewDrive}
+                {'\n'}
+                Skin: {review.reviewSkin}
+              </Text>
+            </View>
+          ))}
       </ScrollView>
     </View>
+
 
   );
 };
@@ -242,21 +155,12 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     borderRadius: 5,
   },
-  contraceptiveDescription: {
-    fontSize: 16,
-    marginBottom: 15,
-    alignSelf: "center",
-    width: 350
-  },
   reviewsHeader: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 10,
     marginLeft: 10,
     color: '#5CCFBA'
-  },
-  reviewsList: {
-    maxHeight: 400,
   },
   reviewItem: {
     marginBottom: 10,
@@ -272,62 +176,7 @@ const styles = StyleSheet.create({
   reviewText: {
     marginBottom: 5,
   },
-  reviewFormContainer: {
-    marginTop: 10,
-    padding: 10,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 5,
-  },
-  reviewFormTitle: {
-    fontSize: 25,
-    fontWeight: 'bold',
-    marginTop: 5,
-    marginBottom: 15,
-    color: '#5CCFBA',
-    alignSelf: "center",
-  },
-  brandUsed: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    marginBottom: 10,
-    padding: 5,
-  },
-  experienceInput: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    marginBottom: 10,
-    height: 100,
-    padding: 5,
-  },
-  radioButtonTitle: {
-    fontWeight: 'bold',
-    marginBottom: 10,
-    backgroundColor: '#5CCFBA',
-  },
-  radioButtonsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginBottom: 10,
-  },
-  radioButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: 20,
-    marginBottom: 10,
-  },
-  radioButtonTextContent: {
-    color: 'white',
-    fontWeight: '600',
-    padding: 5
-  },
-  reviewStars: {
-    display: 'flex',
-    flexDirection: 'row'
-  },
   reviewTitleContent: {
-    display: 'flex',
     flexDirection: 'row',
   },
   reviewButton: {
@@ -342,36 +191,6 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontSize: 16,
-  },
-  reviewFormTopInputs: {
-    color: '#5CCFBA',
-    fontSize: 15,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  submitButton: {
-    backgroundColor: '#5CCFBA',
-    borderRadius: 5,
-    padding: 10,
-    width: '40%',
-    justifyContent: 'center',
-    marginBottom: 16,
-  },
-  submitButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    textAlign: 'center'
-  },
-  submitButtonContainer: {
-    alignItems: 'center',
-    display: 'flex',
-    flexDirection: 'row',
-    marginBottom: 16,
-    justifyContent: 'space-evenly',
-    marginTop: 15,
-  },
-  reviewRatingContainer: {
-    flexDirection: 'row',
   },
 });
 

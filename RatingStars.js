@@ -1,9 +1,8 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { View, Text, TextInput } from 'react-native';
-import styled, { css } from "styled-components/native";
+import styled from "styled-components/native";
 
 const StarRating = styled(View)`
-  display: flex;
   flex-direction: row;
   font-size: 0;
 `;
@@ -17,23 +16,18 @@ const StarInput = styled(TextInput)`
 `;
 
 const StarLabel = styled(Text)`
-  display: flex;
   font-size: 24px;
-  color: lightgrey;
+  color: ${({ filled, hovered }) => (filled || hovered) ? 'gold' : 'lightgrey'};
 
   &:hover,
   &:hover ~ label {
     color: gold;
-    ${props => props.hovered && `
-      background: linear-gradient(to right, gold ${props.percent}%, lightgrey ${props.percent}%);
+    ${({ hovered, percent }) => hovered && `
+      background: linear-gradient(to right, gold ${percent}%, lightgrey ${percent}%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     `}
   }
-
-  ${props => props.filled && css`
-    color: gold;
-  `}
 `;
 
 const RatingStars = ({ reviewRating, onChange }) => {
@@ -71,7 +65,6 @@ const RatingStars = ({ reviewRating, onChange }) => {
       {[...Array(5)].map((_, index) => (
         <StarLabel
           key={index}
-          htmlFor={`reviewRating-${index}`}
           filled={index < reviewRating}
           hovered={index < (hovered || reviewRating)}
           percent={getPercent(index)}
